@@ -47,8 +47,14 @@ def draw_detection_results(
         if len(bbox) != 4:
             raise ValueError(f"Bounding box at index {index} must have exactly 4 values.")
 
-        x_min, y_min, x_max, y_max = (int(coord) for coord in bbox)
+        w, h = rgb_image.size
+        x_min, y_min, x_max, y_max = bbox
         print(label, [x_min, y_min, x_max, y_max], rgb_image.size)
+        x_min = int(x_min * w)
+        y_min = int(y_min * h)
+        x_max = int(x_max * w)
+        y_max = int(y_max * h)
+        print(label, [x_min, y_min, x_max, y_max], rgb_image.size, "\n")
 
         color = color_list[index % len(color_list)]
         rect = Rectangle(

@@ -7,41 +7,10 @@ from langchain_core.messages import HumanMessage
 from PIL import Image
 
 from .models import ResponseFormat, get_model
+from .prompt import PROMPT
 
 # 環境変数の読み込み
 load_dotenv()
-
-PROMPT = """
-入力画像を確認し、以下の対象クラスに含まれる物体だけを検出してください。
-各物体について、クラス名とバウンディングボックスを 1 件ずつ返してください。
-
-# 対象クラス
-{classes_info}
-
-# 検出ルール
-- 上記の対象クラス以外の物体は検出しないでください。
-- 画像中に見つかった対象物体をすべて列挙してください。
-- 1 つの物体に対して 1 件の bbox を返してください。
-- 物体の境界は画像のピクセル座標で表し、座標は [x_min, y_min, x_max, y_max] の順でください。
-- x_min, y_min は左上、x_max, y_max は右下を指します。
-- 座標は整数で、x_min < x_max, y_min < y_max を満たしてください。
-- すべての bbox は画像内に収まるようにしてください。
-- 検出対象が 1 つもない場合は、bbox: [] を返してください。
-
-# 出力形式
-出力は JSON 形式のみで、以下のスキーマに厳密に一致させてください。
-{{
-  "bbox": [
-    {{
-      "class_name": "対象クラス名",
-      "bbox": [x_min, y_min, x_max, y_max]
-    }}
-  ]
-}}
-
-- 追加の説明、見出し、Markdown コードブロックは付けず、JSON のみを返してください。
-- 文字列の引用符やコメントは含めないでください。
-"""
 
 
 class VLMAnnotateAssistant:
