@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "VLMを活用した物体検出バウンディングボックス（BBox）アノテーション補助ツール"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "langchain-google-genai",
+    "matplotlib",
+    "python-dotenv",
+]
 
 [dependency-groups]
 dev = [
