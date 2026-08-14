@@ -5,6 +5,7 @@ from PIL import Image
 
 from modules.annotator import VLMAnnotateAssistant
 from modules.visualize import draw_detection_results
+from modules.voc_format import create_voc_xml
 
 
 def main() -> None:
@@ -30,6 +31,9 @@ def main() -> None:
 
         # 可視化して確認
         draw_detection_results(image=img, bboxes=res.bboxes)
+
+        # Pascal VOC形式のXMLファイルを作成
+        create_voc_xml(img_path=img_path, annotations=res.bboxes)
 
 
 if __name__ == "__main__":
