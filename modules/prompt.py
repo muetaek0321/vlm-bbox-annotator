@@ -1,70 +1,48 @@
 PROMPT = """
-入力画像を確認し、以下の対象クラスに含まれる物体だけを検出してください。
-各物体について、クラス名とバウンディングボックスを1件ずつ返してください。
+Analyze the input image and detect ALL instances of objects belonging to the target classes specified below.
+Detect every single instance comprehensively without omissions (including small, distant, partially occluded objects, or multiple people/vehicles).
 
-# 対象クラス
+# Target Classes (Class Name: Description)
 {classes_info}
 
-# 検出ルール
-- 上記の対象クラス以外の物体は検出しないでください。
-- 入力画像内に存在する対象クラスの物体をすべて検出してください。
-- 1つの物体につき、1件のbboxを返してください。
+* Note: The descriptions above may be written in Japanese. Please interpret them into English concepts to accurately detect the corresponding objects. In the output JSON, always use the exact class name (key) provided above.
 
-# BBox座標の指定方法
-- bboxは、入力画像の横幅・高さに対して0.0～1.0に正規化した座標で表してください。
-- 入力画像の幅をW、入力画像の高さをHとします。
-- x座標は「画像上のx座標 ÷ W」で正規化してください。
-- y座標は「画像上のy座標 ÷ H」で正規化してください。
-- 画像の左端はx=0.0、右端はx=1.0です。
-- 画像の上端はy=0.0、下端はy=1.0です。
-- 座標系の原点は入力画像の左上です。
-- x座標は画像の左から右に増加し、y座標は画像の上から下に増加します。
-- bboxは必ず [x_min, y_min, x_max, y_max] の順序で返してください。
-- x_min, y_minは物体の左上の座標を表します。
-- x_max, y_maxは物体の右下の座標を表します。
-- すべての座標値は0.0以上1.0以下の小数で返してください。
-- x_min < x_max、y_min < y_maxを必ず満たしてください。
-- bboxは必ず入力画像の範囲内に収めてください。
-- 絶対ピクセル座標は使用しないでください。
-- 100、500、1000などのピクセル座標をそのままbboxとして返してはいけません。
-- 物体のbboxを画像上で特定した後、その座標を画像の幅Wまたは高さHで割って0.0～1.0の正規化座標に変換してから出力してください。
+# Detection Rules
+- Detect ONLY objects belonging to the target classes listed above. Do not detect any other objects.
+- Detect every instance of the target classes present in the image comprehensively (no omissions).
+- Assign exactly one bounding box per detected object instance.
 
-# 正規化座標の例
-例えば、入力画像のサイズが1920×1080で、物体のbboxがピクセル座標で
-[x_min, y_min, x_max, y_max] = [384, 216, 960, 864]
-である場合、
+# Bounding Box (BBox) Coordinate Specification
+Each bounding box MUST contain EXACTLY 4 float numbers: [x_min, y_min, x_max, y_max]
+- DO NOT output 2 coordinates (points/centers). You MUST output a 4-coordinate bounding box covering the entire object.
+- Coordinates must be normalized floats between 0.0 and 1.0 (relative to image width and height):
+  - x_min (float, 0.0 to 1.0): Left boundary of the bounding box
+  - y_min (float, 0.0 to 1.0): Top boundary of the bounding box
+  - x_max (float, 0.0 to 1.0): Right boundary of the bounding box
+  - y_max (float, 0.0 to 1.0): Bottom boundary of the bounding box
+- Strict constraints:
+  - Exactly 4 numbers per bbox: [x_min, y_min, x_max, y_max]
+  - 0.0 <= x_min < x_max <= 1.0
+  - 0.0 <= y_min < y_max <= 1.0
+  - Use decimals between 0.0 and 1.0 (e.g., 0.65, NOT 650).
 
-x_min = 384 / 1920 = 0.20
-y_min = 216 / 1080 = 0.20
-x_max = 960 / 1920 = 0.50
-y_max = 864 / 1080 = 0.80
-
-となるため、出力するbboxは必ず
-
-[0.20, 0.20, 0.50, 0.80]
-
-としてください。
-
-この例のように、bboxの各座標は必ず0.0～1.0の正規化座標として出力してください。
-絶対ピクセル座標を出力してはいけません。
-
-例えば、[0.12, 0.25, 0.48, 0.71] は、
-画像の左端から12%、上端から25%の位置を左上、
-画像の左端から48%、上端から71%の位置を右下とするbboxを表します。
-
-# 出力形式
-出力はJSON形式のみで、以下のスキーマに厳密に一致させてください。
-
+# Output Format
+Output MUST be strictly in JSON format conforming to the schema below:
 {{
   "bboxes": [
     {{
-      "class_name": "対象クラス名",
-      "bbox": [x_min, y_min, x_max, y_max]
+      "class_name": "target_class_name",
+      "bbox": [0.12, 0.25, 0.48, 0.71]
+    }},
+    {{
+      "class_name": "target_class_name",
+      "bbox": [0.60, 0.30, 0.88, 0.55]
     }}
   ]
 }}
 
-- 追加の説明、見出し、Markdownコードブロックは付けず、JSONのみを返してください。
-- 文字列の引用符やコメントは含めないでください。
-- 検出対象が1つも存在しない場合は、"bboxes": [] を返してください。
+- Every "bbox" array MUST contain exactly 4 numeric values: [x_min, y_min, x_max, y_max].
+- If multiple target objects exist in the image, include every single detected object in the "bboxes" list.
+- Return ONLY valid JSON without extra text, Markdown commentary, or explanation.
+- If no target objects are found, return: "bboxes": []
 """
