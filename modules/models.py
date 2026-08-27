@@ -1,4 +1,5 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
 
 
@@ -17,22 +18,26 @@ class ResponseFormat(BaseModel):
     )
 
 
-def get_model(model_name: str) -> ChatGoogleGenerativeAI:
+def get_model(model_name: str, model_type: str) -> ChatGoogleGenerativeAI:
     """モデルのインスタンスを取得
 
     Args:
         model_name (str): モデル名
+        model_type (str): モデル種別
 
     Returns:
         ChatGoogleGenerativeAI: モデルのインスタンス
     """
 
     # モデルの設定
-    llm = ChatGoogleGenerativeAI(
-        model=model_name,
-        temperature=0.0,
-        # thinking_budget=4096,
-    )
+    if model_type == "Gemini":
+        llm = ChatGoogleGenerativeAI(
+            model=model_name,
+            temperature=0.0,
+            thinking_budget=4096,
+        )
+    elif model_type == "Ollama":
+        llm = ChatOllama(model=model_name, temperature=0.0)
 
     # 出力フォーマットの設定
     llm = llm.with_structured_output(ResponseFormat)

@@ -26,7 +26,9 @@ class VLMAnnotateAssistant:
         self.prompt = PROMPT.format(classes_info="\n".join(classes_info))
 
         # モデルのインスタンスを取得
-        self.llm = get_model(model_name=os.getenv("MODEL_NAME", "gemini-3.5-flash-lite"))
+        model_name = os.getenv("MODEL_NAME", "gemini-3.5-flash-lite")
+        model_type = os.getenv("MODEL_TYPE", "Gemini")
+        self.llm = get_model(model_name, model_type)
 
     def annotate(self, img: Image.Image) -> ResponseFormat:
         """画像に対してアノテーションを行う
