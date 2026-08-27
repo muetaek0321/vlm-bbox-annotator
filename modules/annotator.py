@@ -39,8 +39,11 @@ class VLMAnnotateAssistant:
         Returns:
             ResponseFormat: アノテーション結果
         """
+        # 入力画像のリサイズ（1000x1000に固定）
+        img_resized = img.resize(size=(1000, 1000))
+
         # base64エンコードする
-        img_base64 = self.image_to_bytes(img)
+        img_base64 = self.image_to_bytes(img_resized)
 
         # プロンプトの設定
         message = HumanMessage(
