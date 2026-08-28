@@ -1,6 +1,7 @@
 import base64
 import os
 from io import BytesIO
+from typing import Any
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
@@ -62,7 +63,9 @@ class VLMAnnotateAssistant:
         # 返答の生成
         response = self.llm.invoke([message])
 
-        return response
+        self.calc_token_per_sec(response["raw"].response_metadata)
+
+        return response["parsed"]
 
     def image_to_bytes(self, img: Image.Image) -> str:
         buffer = BytesIO()
@@ -75,3 +78,17 @@ class VLMAnnotateAssistant:
         img_base64 = base64.b64encode(buffer.getvalue()).decode()
 
         return img_base64
+
+    def calc_token_per_sec(self, response_metadata: dict[Any]) -> None:
+        """token/secを計算する
+
+        Args:
+            response_metadata (dict[Any]): 返答のメタ情報
+            generate_time (float): 生成全体にかかった時間
+        """
+        # token/secの計算
+        eval_count = response_metadata.get("eval_count")
+        eval_duration = response_metadata.get("eval_duration")
+        if eval_count is not None and eval_duration:
+            tokens_per_second = round(eval_count / (eval_duration / 1_000_000_000), 2)
+            print(f"{tokens_per_second} token/sec")

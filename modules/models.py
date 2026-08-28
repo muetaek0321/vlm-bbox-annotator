@@ -40,6 +40,6 @@ def get_model(model_name: str, model_type: str) -> ChatGoogleGenerativeAI:
         llm = ChatOllama(model=model_name, temperature=0.0)
 
     # 出力フォーマットの設定
-    llm = llm.with_structured_output(ResponseFormat)
+    llm = llm.with_structured_output(ResponseFormat, include_raw=True)
 
     return llm
