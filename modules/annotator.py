@@ -1,5 +1,6 @@
 import base64
 import os
+import time
 from io import BytesIO
 from typing import Any
 
@@ -61,8 +62,12 @@ class VLMAnnotateAssistant:
         )
 
         # 返答の生成
+        start_time = time.perf_counter()
         response = self.llm.invoke([message])
+        end_time = time.perf_counter()
 
+        # 全体の処理時間の表示
+        print(f"Elapsed time: {round(end_time - start_time, 2)}s")
         self.calc_token_per_sec(response["raw"].response_metadata)
 
         return response["parsed"]
