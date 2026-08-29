@@ -13,6 +13,7 @@ from .models import BoundingBox
 def draw_detection_results(
     image: Image.Image,
     bboxes: Sequence[BoundingBox],
+    classes: list[str],
     colors: Sequence[str] | None = None,
     linewidth: int = 2,
     font_size: int = 10,
@@ -22,7 +23,7 @@ def draw_detection_results(
     Args:
         image (Image.Image): 元画像。
         bboxes (Sequence[BoundingBox]): バウンディングボックスの情報
-        title (str): 図のタイトル。
+        classes (list[str]): クラスリスト
         colors (Sequence[str] | None): bboxの色一覧。省略時はデフォルトカラーを使用。
         linewidth (int): bbox線の太さ。
         font_size (int): ラベル文字のフォントサイズ。
@@ -56,7 +57,7 @@ def draw_detection_results(
         y_max = int(y_max * h)
         print(label, [x_min, y_min, x_max, y_max], rgb_image.size, "\n")
 
-        color = color_list[index % len(color_list)]
+        color = color_list[classes.index(label)]
         rect = Rectangle(
             (x_min, y_min),
             x_max - x_min,

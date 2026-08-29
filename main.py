@@ -30,7 +30,7 @@ def main() -> None:
         res = annotator.annotate(img)
 
         # 可視化して確認
-        draw_detection_results(image=img, bboxes=res.bboxes)
+        draw_detection_results(img, res.bboxes, classes=list(classes_info.keys()))
 
         # Pascal VOC形式のXMLファイルを作成
         create_voc_xml(img_path=img_path, annotations=res.bboxes)
