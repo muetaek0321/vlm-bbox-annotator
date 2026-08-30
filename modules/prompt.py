@@ -12,16 +12,27 @@ Detect every single instance comprehensively without omissions (including small,
 - Detect every instance of the target classes present in the image comprehensively (no omissions).
 - Assign exactly one bounding box per detected object instance.
 
+# Image Coordinate System Definition
+- Origin (0.0, 0.0) is the TOP-LEFT corner of the image.
+- Bottom-Right corner is (1.0, 1.0).
+- X-axis (Horizontal / Width): Increases from LEFT to RIGHT (0.0 = Leftmost edge, 1.0 = Rightmost edge).
+- Y-axis (Vertical / Height): Increases from TOP to BOTTOM (0.0 = Topmost edge, 1.0 = Bottommost edge).
+
 # Bounding Box (BBox) Coordinate Specification
-Each bounding box MUST contain EXACTLY 4 float numbers: [x_min, y_min, x_max, y_max]
-- DO NOT output 2 coordinates (points/centers). You MUST output a 4-coordinate bounding box covering the entire object.
+Each bounding box MUST contain EXACTLY 4 float numbers in the following order:
+`[x_min, y_min, x_max, y_max]` (which corresponds to `[left, top, right, bottom]`).
+
 - Coordinates must be normalized floats between 0.0 and 1.0 (relative to image width and height):
-  - x_min (float, 0.0 to 1.0): Left boundary of the bounding box
-  - y_min (float, 0.0 to 1.0): Top boundary of the bounding box
-  - x_max (float, 0.0 to 1.0): Right boundary of the bounding box
-  - y_max (float, 0.0 to 1.0): Bottom boundary of the bounding box
-- Strict constraints:
-  - Exactly 4 numbers per bbox: [x_min, y_min, x_max, y_max]
+  - 1st value -> x_min (float, 0.0 to 1.0): Left boundary (Horizontal minimum)
+  - 2nd value -> y_min (float, 0.0 to 1.0): Top boundary (Vertical minimum)
+  - 3rd value -> x_max (float, 0.0 to 1.0): Right boundary (Horizontal maximum)
+  - 4th value -> y_max (float, 0.0 to 1.0): Bottom boundary (Vertical maximum)
+
+- CRITICAL CONSTRAINTS & WARNING:
+  - DO NOT SWAP X AND Y! DO NOT output in `[ymin, xmin, ymax, xmax]` order.
+  - The 1st and 3rd elements MUST ALWAYS be the horizontal coordinates (x_min, x_max / left, right).
+  - The 2nd and 4th elements MUST ALWAYS be the vertical coordinates (y_min, y_max / top, bottom).
+  - Exactly 4 numbers per bbox: `[x_min, y_min, x_max, y_max]`.
   - 0.0 <= x_min < x_max <= 1.0
   - 0.0 <= y_min < y_max <= 1.0
   - Use decimals between 0.0 and 1.0 (e.g., 0.65, NOT 650).
@@ -41,7 +52,7 @@ Output MUST be strictly in JSON format conforming to the schema below:
   ]
 }}
 
-- Every "bbox" array MUST contain exactly 4 numeric values: [x_min, y_min, x_max, y_max].
+- Every "bbox" array MUST contain exactly 4 numeric values: [x_min, y_min, x_max, y_max] = [left, top, right, bottom].
 - If multiple target objects exist in the image, include every single detected object in the "bboxes" list.
 - Return ONLY valid JSON without extra text, Markdown commentary, or explanation.
 - If no target objects are found, return: "bboxes": []

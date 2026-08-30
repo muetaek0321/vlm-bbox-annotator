@@ -7,7 +7,9 @@ class BoundingBox(BaseModel):
     """BBoxの情報の定義"""
 
     class_name: str = Field(description="アノテーション対象のクラスの名称")
-    bbox: list[float] = Field(description="バウンディングボックスの正規化座標(0.0~1.0の範囲)")
+    bbox: list[float] = Field(
+        description="[x_min, y_min, x_max, y_max]（left, top, right, bottom）の順で格納された4つの正規化座標（0.0〜1.0）。1番目と3番目は水平方向X(left/right)、2番目と4番目は垂直方向Y(top/bottom)。決して[ymin, xmin, ymax, xmax]にしないこと。"
+    )
 
 
 class ResponseFormat(BaseModel):
