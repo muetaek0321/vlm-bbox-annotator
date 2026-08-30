@@ -1,4 +1,5 @@
 import json
+from argparse import ArgumentParser
 from pathlib import Path
 
 from PIL import Image
@@ -9,7 +10,11 @@ from modules.voc_format import create_voc_xml
 
 
 def main() -> None:
-    data_path = Path("./data")
+    # コマンドライン引数の設定
+    parser = ArgumentParser()
+    parser.add_argument("-d", "--data", type=str, default="./data")
+    parser.add_argument("-v", "--visualize", action="store_true")
+    args = parser.parse_args()
 
     # クラス情報の読み込み
     with open("classes_info.json", mode="r", encoding="utf-8") as f:
@@ -19,7 +24,7 @@ def main() -> None:
     annotator = VLMAnnotateAssistant(classes_info)
 
     # 画像1枚ずつに処理を適用
-    for img_path in data_path.iterdir():
+    for img_path in Path(args.data).iterdir():
         if img_path.suffix.lower() not in [".jpg", ".bmp", ".png", ".jpeg"]:
             continue
 
@@ -30,7 +35,8 @@ def main() -> None:
         res = annotator.annotate(img)
 
         # 可視化して確認
-        draw_detection_results(img, res.bboxes, classes=list(classes_info.keys()))
+        if args.visualize:
+            draw_detection_results(img, res.bboxes, classes=list(classes_info.keys()))
 
         # Pascal VOC形式のXMLファイルを作成
         create_voc_xml(img_path=img_path, annotations=res.bboxes)
